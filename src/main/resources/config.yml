@@ -1,9 +1,0 @@
-## PrefixPro allows you to add the prefix from LuckPrems to the front of the playername in tab, chat and nametag.
-
-settings:
-  enableNameTag: false
-  enableChatTags: false
-  enableTabName: false
-
-## Update 2.0 will add support for suffixes
-## Current config version 1.2
