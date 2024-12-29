@@ -15,8 +15,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
-
 public final class PrefixPro extends JavaPlugin {
     private LuckPerms luckPerms;
     private PrefixManager prefixManager;
@@ -54,20 +52,11 @@ public final class PrefixPro extends JavaPlugin {
         getCommand("afk").setExecutor(new AfkCommand(this));
         getCommand("prefixpro").setExecutor(new PrefixProCommand(this));
 
-        updateChecker = new UpdateChecker(this);
-        CheckForUpdates(updateChecker);
+        updateChecker = new UpdateChecker(this, "Do8Ixhbm");
+        updateChecker.checkForUpdates();
         Metrics metrics = new Metrics(this, 23462);
         
         logger.info(Messages.CONSOLE_PLUGIN_ENABLED);
-    }
-
-    public void CheckForUpdates(UpdateChecker updateChecker){
-        List<String> nameless = updateChecker.generateUpdateMessage(getDescription().getVersion());
-        if (!nameless.isEmpty()){
-            for (String message : nameless){
-                logger.warning(message);
-            }
-        }
     }
 
     @Override
