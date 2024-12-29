@@ -3,6 +3,7 @@ package com.samvolvo.prefixPro;
 import com.samvolvo.prefixPro.commands.AfkCommand;
 import com.samvolvo.prefixPro.commands.PrefixProCommand;
 import com.samvolvo.prefixPro.listeners.PlayerListener;
+import com.samvolvo.prefixPro.listeners.LuckPermsListener;
 import com.samvolvo.prefixPro.managers.AfkManager;
 import com.samvolvo.prefixPro.managers.ConfigManager;
 import com.samvolvo.prefixPro.managers.Metrics;
@@ -10,6 +11,9 @@ import com.samvolvo.prefixPro.utils.Logger;
 import com.samvolvo.prefixPro.utils.Messages;
 import com.samvolvo.prefixPro.utils.UpdateChecker;
 import net.luckperms.api.LuckPerms;
+import net.luckperms.api.event.node.NodeAddEvent;
+import net.luckperms.api.event.node.NodeRemoveEvent;
+import net.luckperms.api.event.user.UserDataRecalculateEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -44,6 +48,12 @@ public final class PrefixPro extends JavaPlugin {
         luckPerms = provider.getProvider();
         prefixManager = new PrefixManager(this, luckPerms);
         afkManager = new AfkManager(this);
+
+        // Register LuckPerms listener
+        LuckPermsListener lpListener = new LuckPermsListener(this, prefixManager);
+        luckPerms.getEventBus().subscribe(this, NodeAddEvent.class, lpListener::onNodeAdd);
+        luckPerms.getEventBus().subscribe(this, NodeRemoveEvent.class, lpListener::onNodeRemove);
+        luckPerms.getEventBus().subscribe(this, UserDataRecalculateEvent.class, lpListener::onDataRecalculate);
 
         // Register events
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
