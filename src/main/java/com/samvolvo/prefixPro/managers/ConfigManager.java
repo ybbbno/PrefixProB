@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 public class ConfigManager {
     private final PrefixPro plugin;
@@ -61,11 +60,10 @@ public class ConfigManager {
 
         if (changes) {
             try {
-                // Save with proper formatting
                 saveConfigWithSpacing();
-                plugin.getLogger().info("Config has been updated successfully!");
+                plugin.getCustomLogger().info("Config has been updated successfully!");
             } catch (IOException e) {
-                plugin.getLogger().log(Level.SEVERE, "Could not save updated config!", e);
+                plugin.getCustomLogger().error("Could not save updated config!");
             }
         }
     }

@@ -4,7 +4,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class Messages {
-    private static String prefix = "&8[&6PrefixPro&8] &7"; // Default prefix
+    private static final Logger logger = new Logger();
+
+    public static String prefix = "&8[&6PrefixPro&8] &7"; // Default prefix
 
     // Console messages (no prefix for console)
     public static final String CONSOLE_PLUGIN_ENABLED = "PrefixPro has been enabled!";
@@ -25,6 +27,8 @@ public class Messages {
     public static void updatePrefix(FileConfiguration config) {
         prefix = ChatColor.translateAlternateColorCodes('&', 
             config.getString("messages.prefix", "&8[&6PrefixPro&8] &7"));
+        
+        logger.debug("Updated message prefix: " + prefix);
         
         // Initialize messages with prefix
         PLAYER_NOW_AFK = prefix + "You are now AFK";

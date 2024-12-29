@@ -58,7 +58,10 @@ public class AfkManager {
     }
 
     public void setAfk(Player player, boolean afk) {
-        if (!player.hasPermission("prefixpro.afk")) return;
+        if (!player.hasPermission("prefixpro.afk")) {
+            plugin.getLogger().warning("Player " + player.getName() + " attempted to use AFK without permission");
+            return;
+        }
         
         Boolean currentAfk = afkPlayers.get(player.getUniqueId());
         if (currentAfk != null && currentAfk == afk) return;
