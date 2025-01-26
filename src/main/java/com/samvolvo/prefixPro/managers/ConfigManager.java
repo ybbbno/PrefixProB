@@ -30,7 +30,7 @@ public class ConfigManager {
             if (dataFolder.mkdirs()) {
                 plugin.getLogger().info("Data folder created: " + dataFolder.getPath());
             } else {
-                plugin.getLogger().warning("Could not create data folder: " + dataFolder.getPath());
+                plugin.getCustomLogger().error("Could not create data folder: " + dataFolder.getPath());
             }
         }
     }
