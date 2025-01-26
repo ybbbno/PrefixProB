@@ -20,7 +20,19 @@ public class ConfigManager {
 
     public ConfigManager(PrefixPro plugin) {
         this.plugin = plugin;
+        createDataFolder(); // Ensure the data folder exists
         loadConfig();
+    }
+
+    private void createDataFolder() {
+        File dataFolder = plugin.getDataFolder();
+        if (!dataFolder.exists()) {
+            if (dataFolder.mkdirs()) {
+                plugin.getLogger().info("Data folder created: " + dataFolder.getPath());
+            } else {
+                plugin.getLogger().warning("Could not create data folder: " + dataFolder.getPath());
+            }
+        }
     }
 
     public void loadConfig() {
