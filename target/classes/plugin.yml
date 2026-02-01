@@ -1,0 +1,26 @@
+name: PrefixPro
+version: '2.1'
+main: com.samvolvo.prefixPro.PrefixPro
+api-version: '1.21'
+prefix: PrefixPro
+authors: [ SamVolvo ]
+website: https://samvolvo.com
+depend: [LuckPerms]
+
+commands:
+  afk:
+    description: Toggle AFK status
+    usage: /afk
+    permission: prefixpro.afk
+  prefixpro:
+    description: Plugin management commands
+    usage: /prefixpro <config|plugin> reload
+    permission: prefixpro.admin
+
+permissions:
+  prefixpro.afk:
+    description: Allows use of AFK features
+    default: true
+  prefixpro.admin:
+    description: Allows use of admin commands
+    default: op

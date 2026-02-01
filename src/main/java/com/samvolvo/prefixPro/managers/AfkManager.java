@@ -1,8 +1,8 @@
 package com.samvolvo.prefixPro.managers;
 
 import com.samvolvo.prefixPro.PrefixPro;
+import com.samvolvo.prefixPro.utils.ColorUtil;
 import com.samvolvo.prefixPro.utils.Messages;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -70,7 +70,7 @@ public class AfkManager {
         
         if (afk) {
             player.setInvulnerable(true);
-            String suffix = ChatColor.translateAlternateColorCodes('&', 
+            String suffix = ColorUtil.colorize(
                 plugin.getConfig().getString("afk.suffix", " &7[AFK]"));
             plugin.getPrefixManager().updatePlayerAfk(player, suffix);
             player.sendMessage(Messages.PLAYER_NOW_AFK);

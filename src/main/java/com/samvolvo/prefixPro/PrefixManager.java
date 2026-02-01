@@ -1,5 +1,6 @@
 package com.samvolvo.prefixPro;
 
+import com.samvolvo.prefixPro.utils.ColorUtil;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
 import org.bukkit.ChatColor;
@@ -24,11 +25,12 @@ public class PrefixManager {
         if (user == null) return "";
         
         String prefix = user.getCachedData().getMetaData().getPrefix();
-        return prefix != null ? ChatColor.translateAlternateColorCodes('&', prefix) + " " : "";
+        return prefix != null ? ColorUtil.colorize(prefix) + " " : "";
     }
 
     public void updatePlayerPrefix(Player player) {
         String prefix = getPrefix(player);
+        String playerName = applyPrefixColorToName(prefix, player.getName());
         String teamName = "nt_" + player.getName();
         
         // Get the main scoreboard
@@ -42,34 +44,45 @@ public class PrefixManager {
         
         // Create new team for nametag
         team = mainScoreboard.registerNewTeam(teamName);
+        team.addEntry(player.getName());
+        
         if (plugin.getConfig().getBoolean("display.nametag", true)) {
             team.setPrefix(prefix);
+            team.setSuffix("");
         }
-        team.addEntry(player.getName());
         
         // Update tab list name if enabled
         if (plugin.getConfig().getBoolean("display.tab", true)) {
-            player.setPlayerListName(prefix + ChatColor.RESET + player.getName());
+            player.setPlayerListName(prefix + playerName);
         }
-        
-        // Keep original name for vanilla interactions
-        player.setDisplayName(player.getName());
-        player.setCustomNameVisible(false);
     }
 
     public void updatePlayerAfk(Player player, String suffix) {
         String prefix = getPrefix(player);
+        String playerName = applyPrefixColorToName(prefix, player.getName());
         String teamName = "nt_" + player.getName();
         
-        Team team = player.getScoreboard().getTeam(teamName);
-        if (team != null) {
-            if (plugin.getConfig().getBoolean("display.nametag", true)) {
-                team.setSuffix(suffix);
-            }
+        // Get the main scoreboard for consistency
+        Scoreboard mainScoreboard = scoreboardManager.getMainScoreboard();
+        Team team = mainScoreboard.getTeam(teamName);
+        
+        if (team != null && plugin.getConfig().getBoolean("display.nametag", true)) {
+            team.setSuffix(suffix);
         }
         
         if (plugin.getConfig().getBoolean("display.tab", true)) {
-            player.setPlayerListName(prefix + ChatColor.RESET + player.getName() + suffix);
+            player.setPlayerListName(prefix + playerName + suffix);
         }
     }
-} 
+
+    /**
+     * Ensures the player's name inherits the final colors from the prefix when no reset is present.
+     */
+    public String applyPrefixColorToName(String prefix, String playerName) {
+        String trailing = ColorUtil.getLastColors(prefix);
+        if (trailing.isEmpty()) {
+            return playerName;
+        }
+        return trailing + playerName;
+    }
+}

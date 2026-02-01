@@ -25,7 +25,7 @@ public class Messages {
     public static String COMMAND_PLUGIN_RELOADED;
 
     public static void updatePrefix(FileConfiguration config) {
-        prefix = ChatColor.translateAlternateColorCodes('&', 
+        prefix = ColorUtil.colorize(
             config.getString("messages.prefix", "&8[&6PrefixPro&8] &7"));
         
         logger.debug("Updated message prefix: " + prefix);

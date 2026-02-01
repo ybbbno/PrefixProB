@@ -1,5 +1,6 @@
 package com.samvolvo.prefixPro.listeners;
 
+import com.samvolvo.prefixPro.utils.ColorUtil;
 import com.samvolvo.prefixPro.PrefixPro;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -7,9 +8,9 @@ import org.bukkit.event.player.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
+import org.bukkit.ChatColor;
 
 public class PlayerListener implements Listener {
     private final PrefixPro plugin;
@@ -63,7 +64,12 @@ public class PlayerListener implements Listener {
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         if (plugin.getConfig().getBoolean("display.chat", true)) {
             String prefix = plugin.getPrefixManager().getPrefix(event.getPlayer());
-            event.setFormat(prefix + ChatColor.RESET + "%1$s: %2$s");
+            String playerName = plugin.getPrefixManager()
+                .applyPrefixColorToName(prefix, ColorUtil.colorize(event.getPlayer().getDisplayName()));
+            String suffix = plugin.getAfkManager().isAfk(event.getPlayer()) 
+                ? ColorUtil.colorize(plugin.getConfig().getString("afk.suffix", " &7[AFK]")) 
+                : "";
+            event.setFormat(prefix + playerName + suffix + ChatColor.RESET + ": %2$s");
         }
         plugin.getAfkManager().updateActivity(event.getPlayer());
     }
