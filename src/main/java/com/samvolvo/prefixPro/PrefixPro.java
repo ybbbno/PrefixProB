@@ -2,6 +2,8 @@ package com.samvolvo.prefixPro;
 
 import com.samvolvo.prefixPro.commands.AfkCommand;
 import com.samvolvo.prefixPro.commands.PrefixProCommand;
+import com.samvolvo.prefixPro.listeners.AfkListener;
+import com.samvolvo.prefixPro.listeners.CustomJoinMessage;
 import com.samvolvo.prefixPro.listeners.PlayerListener;
 import com.samvolvo.prefixPro.listeners.LuckPermsListener;
 import com.samvolvo.prefixPro.managers.AfkManager;
@@ -57,6 +59,8 @@ public final class PrefixPro extends JavaPlugin {
 
         // Register events
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        getServer().getPluginManager().registerEvents(new CustomJoinMessage(this), this);
+        getServer().getPluginManager().registerEvents(new AfkListener(this), this);
         
         // Register commands
         getCommand("afk").setExecutor(new AfkCommand(this));

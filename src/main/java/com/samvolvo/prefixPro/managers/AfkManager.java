@@ -16,6 +16,8 @@ public class AfkManager {
     private final Map<UUID, BukkitTask> afkTasks;
     private final Map<UUID, Boolean> afkPlayers;
 
+    private final Map<UUID, BukkitTask> afkTitleTasks = new HashMap<>();
+
     public AfkManager(PrefixPro plugin) {
         this.plugin = plugin;
         this.lastActivity = new HashMap<>();
@@ -74,11 +76,13 @@ public class AfkManager {
                 plugin.getConfig().getString("afk.suffix", " &7[AFK]"));
             plugin.getPrefixManager().updatePlayerAfk(player, suffix);
             player.sendMessage(Messages.PLAYER_NOW_AFK);
+            startAfkTitle(player);
             cancelAfkTask(player);
         } else {
             player.setInvulnerable(false);
             plugin.getPrefixManager().updatePlayerAfk(player, "");
             player.sendMessage(Messages.PLAYER_NO_LONGER_AFK);
+            stopAfkTitle(player);
             scheduleAfkCheck(player);
         }
     }
@@ -91,5 +95,29 @@ public class AfkManager {
         cancelAfkTask(player);
         lastActivity.remove(player.getUniqueId());
         afkPlayers.remove(player.getUniqueId());
+    }
+
+    public void startAfkTitle(Player player) {
+        stopAfkTitle(player);
+
+        BukkitTask task = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
+            if (!player.isOnline() || !isAfk(player)) {
+                stopAfkTitle(player);
+                return;
+            }
+
+            player.sendTitle("§cAFK", "§7Sneak To exit AFK", 0, 40, 0);
+        }, 0L, 30L);
+
+        afkTitleTasks.put(player.getUniqueId(), task);
+    }
+
+    public void stopAfkTitle(Player player) {
+        BukkitTask task = afkTitleTasks.remove(player.getUniqueId());
+        if (task != null) {
+            task.cancel();
+        }
+
+        player.resetTitle();
     }
 } 

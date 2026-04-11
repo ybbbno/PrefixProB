@@ -1,5 +1,5 @@
 # PrefixPro Configuration
-config-version: 2
+config-version: 3
 
 # Display Settings
 display:
@@ -10,6 +10,8 @@ display:
 # Message Settings
 messages:
   prefix: "&8[&6PrefixPro&8] &7"
+  join-leave-message:
+    enabled: true
 
 # AFK Settings
 afk:
@@ -18,4 +20,4 @@ afk:
   # Suffix that appears when AFK
   suffix: " &7[AFK]"
   # Enable auto-AFK feature
-  auto-enabled: true 
+  auto-enabled: true

@@ -1,5 +1,5 @@
 name: PrefixPro
-version: '2.1'
+version: '2.1.2'
 main: com.samvolvo.prefixPro.PrefixPro
 api-version: '1.21'
 prefix: PrefixPro

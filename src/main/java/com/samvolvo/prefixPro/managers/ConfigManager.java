@@ -16,7 +16,7 @@ public class ConfigManager {
     private final PrefixPro plugin;
     private FileConfiguration config;
     private File configFile;
-    private final int CURRENT_CONFIG_VERSION = 2;
+    private final int CURRENT_CONFIG_VERSION = 3;
 
     public ConfigManager(PrefixPro plugin) {
         this.plugin = plugin;
@@ -59,7 +59,7 @@ public class ConfigManager {
         boolean changes = false;
 
         // Update from version 1 to 2
-        if (currentVersion < 2) {
+        if (currentVersion < 3) {
             if (!config.contains("messages.prefix")) {
                 config.set("messages.prefix", defaultConfig.getString("messages.prefix"));
                 changes = true;

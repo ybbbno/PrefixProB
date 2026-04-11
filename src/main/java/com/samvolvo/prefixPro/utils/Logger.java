@@ -10,7 +10,7 @@ public class Logger {
     }
 
     public void debug(String message){
-        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&b[DEBUG]: &r" + message));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&d[DEBUG]: &r" + message));
     }
 
     public void warning(String message){
@@ -22,7 +22,7 @@ public class Logger {
     }
 
     public void info(String message){
-        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[INFO]: &r" + message));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&b[INFO]: &r" + message));
     }
 
 }
