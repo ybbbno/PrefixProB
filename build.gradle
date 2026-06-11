@@ -29,8 +29,11 @@ dependencies {
     api libs.org.json.json
     api libs.com.squareup.okhttp3.okhttp
     api libs.com.google.code.gson.gson
+
     compileOnly "io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT"
     compileOnly libs.net.luckperms.api
+
+    implementation files("libs/YBMJ-0.1.5.jar")
 }
 
 group = 'com.samvolvo'

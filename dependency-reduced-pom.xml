@@ -24,13 +24,53 @@
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.3</version>
+        <version>3.6.0</version>
         <executions>
           <execution>
             <phase>package</phase>
             <goals>
               <goal>shade</goal>
             </goals>
+            <configuration>
+              <minimizeJar>true</minimizeJar>
+              <createDependencyReducedPom>true</createDependencyReducedPom>
+              <shadedArtifactAttached>false</shadedArtifactAttached>
+              <shadedClassifierName />
+              <transformers>
+                <transformer />
+                <transformer />
+              </transformers>
+              <relocations>
+                <relocation>
+                  <pattern>com.google.gson</pattern>
+                  <shadedPattern>com.samvolvo.shaded.gson</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.squareup.okhttp3</pattern>
+                  <shadedPattern>com.samvolvo.shaded.okhttp3</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.json</pattern>
+                  <shadedPattern>com.samvolvo.shaded.json</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>me.deadybbb</pattern>
+                  <shadedPattern>com.samvolvo.shaded</shadedPattern>
+                </relocation>
+              </relocations>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                    <exclude>META-INF/INDEX.LIST</exclude>
+                    <exclude>META-INF/MANIFEST.MF</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -58,6 +98,13 @@
       <artifactId>api</artifactId>
       <version>5.4</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>me.deadybbb</groupId>
+      <artifactId>YBMJ</artifactId>
+      <version>0.1.5</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/libs/YBMJ-0.1.5.jar</systemPath>
     </dependency>
   </dependencies>
   <properties>

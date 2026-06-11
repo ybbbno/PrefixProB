@@ -31,13 +31,64 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.6.0</version> <!-- Use latest stable -->
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <!-- Core settings -->
+                            <minimizeJar>true</minimizeJar>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <shadedArtifactAttached>false</shadedArtifactAttached> <!-- Overwrites the main JAR -->
+                            <shadedClassifierName/> <!-- No classifier -->
+
+                            <!-- Make the JAR executable (optional but useful) -->
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <!-- Add your main class here if you have one -->
+                                    <!-- <mainClass>com.samvolvo.prefixpro.PrefixPro</mainClass> -->
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+
+                            <!-- Relocations - Highly recommended to avoid conflicts -->
+                            <relocations>
+                                <!-- Example relocations (add more if you hit conflicts) -->
+                                <relocation>
+                                    <pattern>com.google.gson</pattern>
+                                    <shadedPattern>com.samvolvo.shaded.gson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.squareup.okhttp3</pattern>
+                                    <shadedPattern>com.samvolvo.shaded.okhttp3</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.json</pattern>
+                                    <shadedPattern>com.samvolvo.shaded.json</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>me.deadybbb</pattern>
+                                    <shadedPattern>com.samvolvo.shaded</shadedPattern>
+                                </relocation>
+                            </relocations>
+
+                            <!-- Clean filters -->
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/INDEX.LIST</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -88,6 +139,13 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>me.deadybbb</groupId>
+            <artifactId>YBMJ</artifactId>
+            <version>0.1.5</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/YBMJ-0.1.5.jar</systemPath>
         </dependency>
     </dependencies>
 </project>
