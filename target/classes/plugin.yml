@@ -1,9 +1,9 @@
 name: PrefixPro
-version: '2.1.2'
+version: '2.1.2b'
 main: com.samvolvo.prefixPro.PrefixPro
 api-version: '1.21'
 prefix: PrefixPro
-authors: [ SamVolvo ]
+authors: [ SamVolvo, ybbbno ]
 website: https://samvolvo.com
 depend: [LuckPerms]
 
