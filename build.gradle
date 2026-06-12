@@ -23,6 +23,8 @@ repositories {
         name = "papermc-repo"
         url = 'https://repo.papermc.io/repository/maven-public/'
     }
+
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {

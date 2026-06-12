@@ -13,6 +13,7 @@ import me.deadybbb.ybmj.PluginProvider;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.jetbrains.annotations.NotNull;
 
 public final class PrefixPro extends PluginProvider {
     private SuffixAfkManager afkManager;
@@ -21,9 +22,20 @@ public final class PrefixPro extends PluginProvider {
     private PrefixConfigManager manager;
     private PrefixConfig config;
 
+    public static @NotNull LuckPerms luckPermsProvider;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
+
+        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+        if (provider == null) {
+            logger.severe("LuckPerms not found! Disabling plugin...");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        luckPermsProvider = provider.getProvider();
 
         manager = new PrefixConfigManager(this);
         config = manager.getConfig();

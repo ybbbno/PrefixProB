@@ -1,10 +1,13 @@
 package com.samvolvo.prefixPro.managers;
 
+import com.samvolvo.prefixPro.PrefixPro;
 import com.samvolvo.prefixPro.config.PrefixConfig;
-import com.samvolvo.prefixPro.config.PrefixConfigManager;
 import com.samvolvo.prefixPro.utils.ColorUtil;
 import me.deadybbb.ybmj.BasicManagerHandler;
 import me.deadybbb.ybmj.PluginProvider;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.types.PrefixNode;
+import net.luckperms.api.node.types.SuffixNode;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -116,11 +119,28 @@ public class PlayerManager extends BasicManagerHandler {
             return;
         }
 
-        String finalPrefix = prefix != null ? prefix : "";
-        String finalSuffix = suffix != null ? suffix : "";
+        String finalPrefix = prefix != null ? ColorUtil.colorize(prefix) : "";
+        String finalSuffix = suffix != null ? ColorUtil.colorize(suffix) : "";
 
-        String finalName = ColorUtil.colorize(finalPrefix) + ChatColor.RESET + player.getName() + ChatColor.RESET + ColorUtil.colorize(finalSuffix);
+        String finalName = finalPrefix + ChatColor.RESET + player.getName() + ChatColor.RESET + suffix;
         player.setPlayerListName(finalName);
+
+        PrefixNode prefixNode = PrefixNode.builder(finalPrefix, 100).build();
+        SuffixNode suffixNode = SuffixNode.builder(finalSuffix, 150).build();
+
+        User user = PrefixPro.luckPermsProvider.getUserManager().getUser(player.getUniqueId());
+
+        if (finalPrefix.isEmpty()) {
+            user.data().clear(n -> n.getType().matches(prefixNode));
+        } else {
+            user.data().add(prefixNode);
+        }
+
+        if (finalSuffix.isEmpty()) {
+            user.data().clear(n -> n.getType().matches(suffixNode));
+        } else {
+            user.data().add(suffixNode);
+        }
     }
 
     /**

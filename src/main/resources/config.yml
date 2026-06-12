@@ -19,7 +19,7 @@ display:
   nametag: true
 
 rec:
-  prefix: "§4[⏺] "
+  prefix: "§4[⏺] §f"
 
 # AFK Settings
 afk:
