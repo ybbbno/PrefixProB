@@ -1,23 +1,33 @@
 # PrefixPro Configuration
 config-version: 3
 
+# Message Settings
+messages:
+  prefix: ""
+  player_now_afk: "You are now AFK"
+  player_no_longer_afk: "You are no longer AFK"
+  player_no_permission: "§cYou don't have permission to use this command!"
+  player_console_only: "This command can only be used by players!"
+  command_usage: "§cUsage: /prefixprob reload"
+  command_plugin_reloaded: "§aPlugin reloaded!"
+  join-leave-message: true
+
 # Display Settings
 display:
   tab: true
   chat: true
   nametag: true
 
-# Message Settings
-messages:
-  prefix: "&8[&6PrefixPro&8] &7"
-  join-leave-message:
-    enabled: true
+rec:
+  prefix: "§4[⏺] "
 
 # AFK Settings
 afk:
   # Time in seconds before auto-AFK (300 = 5 minutes)
   auto-time: 300
   # Suffix that appears when AFK
-  suffix: " &7[AFK]"
+  suffix: " &7[⌚]"
+  screen_title: "§cAFK"
+  screen_subtitle: "§7Sneak To exit AFK"
   # Enable auto-AFK feature
   auto-enabled: true

@@ -2,112 +2,69 @@ package com.samvolvo.prefixPro;
 
 import com.samvolvo.prefixPro.commands.AfkCommand;
 import com.samvolvo.prefixPro.commands.PrefixProCommand;
-import com.samvolvo.prefixPro.listeners.AfkListener;
+import com.samvolvo.prefixPro.commands.RecCommand;
+import com.samvolvo.prefixPro.config.PrefixConfig;
+import com.samvolvo.prefixPro.config.PrefixConfigManager;
 import com.samvolvo.prefixPro.listeners.CustomJoinMessage;
 import com.samvolvo.prefixPro.listeners.PlayerListener;
-import com.samvolvo.prefixPro.listeners.LuckPermsListener;
-import com.samvolvo.prefixPro.managers.AfkManager;
-import com.samvolvo.prefixPro.managers.ConfigManager;
-import com.samvolvo.prefixPro.managers.Metrics;
-import com.samvolvo.prefixPro.utils.Logger;
-import com.samvolvo.prefixPro.utils.Messages;
-import com.samvolvo.prefixPro.utils.UpdateChecker;
+import com.samvolvo.prefixPro.managers.PrefixRecManager;
+import com.samvolvo.prefixPro.managers.SuffixAfkManager;
 import me.deadybbb.ybmj.PluginProvider;
 import net.luckperms.api.LuckPerms;
-import net.luckperms.api.event.node.NodeAddEvent;
-import net.luckperms.api.event.node.NodeRemoveEvent;
-import net.luckperms.api.event.user.UserDataRecalculateEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 public final class PrefixPro extends PluginProvider {
-    private LuckPerms luckPerms;
-    private PrefixManager prefixManager;
-    private AfkManager afkManager;
-    private ConfigManager configManager;
-    private UpdateChecker updateChecker;
-    private final Logger logger = new Logger();
+    private SuffixAfkManager afkManager;
+    private PrefixRecManager recManager;
+
+    private PrefixConfigManager manager;
+    private PrefixConfig config;
 
     @Override
     public void onEnable() {
-        // Initialize config manager
-        configManager = new ConfigManager(this);
+        saveDefaultConfig();
 
-        logger.loading("Booting PrefixPro");
-        
-        // Initialize messages with config prefix
-        Messages.updatePrefix(configManager.getConfig());
-        
-        // Get LuckPerms API
-        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-        if (provider == null) {
-            logger.error(Messages.CONSOLE_LUCKPERMS_NOT_FOUND);
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-        
-        luckPerms = provider.getProvider();
-        prefixManager = new PrefixManager(this, luckPerms);
-        afkManager = new AfkManager(this);
+        manager = new PrefixConfigManager(this);
+        config = manager.getConfig();
 
-        // Register LuckPerms listener
-        LuckPermsListener lpListener = new LuckPermsListener(this, prefixManager);
-        luckPerms.getEventBus().subscribe(this, NodeAddEvent.class, lpListener::onNodeAdd);
-        luckPerms.getEventBus().subscribe(this, NodeRemoveEvent.class, lpListener::onNodeRemove);
-        luckPerms.getEventBus().subscribe(this, UserDataRecalculateEvent.class, lpListener::onDataRecalculate);
+        afkManager = new SuffixAfkManager(this, config);
+        afkManager.init();
+
+        recManager = new PrefixRecManager(this, config);
+        recManager.init();
 
         // Register events
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new CustomJoinMessage(this), this);
-        getServer().getPluginManager().registerEvents(new AfkListener(this), this);
         
         // Register commands
-        getCommand("afk").setExecutor(new AfkCommand(this));
-        getCommand("prefixpro").setExecutor(new PrefixProCommand(this));
-
-        updateChecker = new UpdateChecker(this, "Do8Ixhbm");
-        updateChecker.checkForUpdates();
-        Metrics metrics = new Metrics(this, 23462);
-        
-        logger.info(Messages.CONSOLE_PLUGIN_ENABLED);
+        getCommand("afk").setExecutor(new AfkCommand(this, afkManager));
+        getCommand("rec").setExecutor(new RecCommand(this, recManager));
+        getCommand("prefixprob").setExecutor(new PrefixProCommand(this));
     }
 
     @Override
     public void onDisable() {
-        logger.info(Messages.CONSOLE_PLUGIN_DISABLED);
+        afkManager.deinit();
+        recManager.deinit();
+        logger.info("PrefixPro has been disabled!");
     }
 
     public void reload() {
-        configManager.reloadConfig();
-        Messages.updatePrefix(configManager.getConfig());
-        // Refresh all online players
-        Bukkit.getOnlinePlayers().forEach(player -> {
-            prefixManager.updatePlayerPrefix(player);
-            if (afkManager.isAfk(player)) {
-                afkManager.setAfk(player, false);
-            }
-        });
+        Bukkit.getScheduler().runTask(this, this::onDisable);
+        Bukkit.getScheduler().runTask(this, this::onEnable);
     }
 
-    public PrefixManager getPrefixManager() {
-        return prefixManager;
+    public PrefixConfig getPrefixConfig() {
+        return new PrefixConfig(config.messages(), config.display(), config.rec(), config.afk());
     }
 
-    public AfkManager getAfkManager() {
+    public SuffixAfkManager getAfkManager() {
         return afkManager;
     }
 
-    public FileConfiguration getConfig() {
-        return configManager.getConfig();
-    }
-
-    public Logger getCustomLogger() {
-        return logger;
-    }
-
-    @Override
-    public void reloadConfig() {
-        configManager.reloadConfig();
+    public PrefixRecManager getRecManager() {
+        return recManager;
     }
 }

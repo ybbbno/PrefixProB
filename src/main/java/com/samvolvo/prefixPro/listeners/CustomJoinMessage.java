@@ -10,18 +10,15 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class CustomJoinMessage implements Listener {
     private PrefixPro plugin;
-    private FileConfiguration config;
 
     public CustomJoinMessage(PrefixPro plugin){
         this.plugin = plugin;
-        config = plugin.getConfig();
     }
 
     // Custom Join Message
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
-
-        if (!config.getBoolean("messages.join-leave-message.enabled")){
+        if (!plugin.getPrefixConfig().isJoinLeaveMessages()){
             event.setJoinMessage(null);
             return;
         }
@@ -34,8 +31,7 @@ public class CustomJoinMessage implements Listener {
     // Custom Leave message
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event){
-
-        if (!config.getBoolean("messages.join-leave-message.enabled")){
+        if (!plugin.getPrefixConfig().isJoinLeaveMessages()){
             event.setQuitMessage(null);
             return;
         }
@@ -44,6 +40,4 @@ public class CustomJoinMessage implements Listener {
 
         event.setQuitMessage(ChatColor.translateAlternateColorCodes('&', "&e" + playerName + " left the game"));
     }
-
-
 }

@@ -38,7 +38,7 @@ dependencies {
 
 group = 'com.samvolvo'
 version = '2.1.2b'
-description = 'PrefixPro'
+description = 'PrefixProB'
 java.sourceCompatibility = JavaVersion.VERSION_21
 
 publishing {

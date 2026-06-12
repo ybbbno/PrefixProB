@@ -1,7 +1,10 @@
 package com.samvolvo.prefixPro.listeners;
 
-import com.samvolvo.prefixPro.utils.ColorUtil;
+import com.samvolvo.prefixPro.config.PrefixConfig;
+import com.samvolvo.prefixPro.managers.PrefixRecManager;
+import com.samvolvo.prefixPro.managers.SuffixAfkManager;
 import com.samvolvo.prefixPro.PrefixPro;
+import com.samvolvo.prefixPro.utils.ColorUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
@@ -14,27 +17,51 @@ import org.bukkit.ChatColor;
 
 public class PlayerListener implements Listener {
     private final PrefixPro plugin;
+    private final SuffixAfkManager afkManager;
+    private final PrefixRecManager recManager;
 
     public PlayerListener(PrefixPro plugin) {
         this.plugin = plugin;
+        this.afkManager = plugin.getAfkManager();
+        this.recManager = plugin.getRecManager();
+    }
+
+    @EventHandler
+    public void onSneakEvent(PlayerToggleSneakEvent event) {
+        if (afkManager.isAfk(event.getPlayer()) && event.isSneaking()) {
+            afkManager.setAfk(event.getPlayer(), false);
+        }
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+
         event.getPlayer().getServer().getScheduler().runTaskLater(
             plugin,
-            () -> plugin.getPrefixManager().updatePlayerPrefix(event.getPlayer()),
+            () -> {
+                if (afkManager.isAfk(player)) {
+                    afkManager.setAfk(player, true);
+                }
+
+                if (recManager.isRec(player)) {
+                    recManager.setRec(player, true);
+                }
+            },
             1L
         );
         
-        if (event.getPlayer().hasPermission("prefixpro.afk")) {
-            plugin.getAfkManager().updateActivity(event.getPlayer());
+        if (event.getPlayer().hasPermission("prefixprob.afk")) {
+            afkManager.updateActivity(event.getPlayer());
         }
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        plugin.getAfkManager().cleanup(event.getPlayer());
+        Player player = event.getPlayer();
+
+        afkManager.cleanup(player);
+        recManager.cleanup(player);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -46,44 +73,54 @@ public class PlayerListener implements Listener {
             
             Player player = event.getPlayer();
             
-            if (plugin.getAfkManager().isAfk(player)) {
+            if (afkManager.isAfk(player)) {
                 // If player is actively moving (not just being pushed)
                 if (player.isSprinting() || player.isSneaking()) {
-                    plugin.getAfkManager().setAfk(player, false);
+                    afkManager.setAfk(player, false);
                 } else {
                     // Cancel movement if being pushed
                     event.setTo(event.getFrom());
                 }
             } else {
-                plugin.getAfkManager().updateActivity(player);
+                afkManager.updateActivity(player);
             }
         }
     }
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
-        if (plugin.getConfig().getBoolean("display.chat", true)) {
-            String prefix = plugin.getPrefixManager().getPrefix(event.getPlayer());
-            String playerName = plugin.getPrefixManager()
-                .applyPrefixColorToName(prefix, ColorUtil.colorize(event.getPlayer().getDisplayName()));
-            String suffix = plugin.getAfkManager().isAfk(event.getPlayer()) 
-                ? ColorUtil.colorize(plugin.getConfig().getString("afk.suffix", " &7[AFK]")) 
-                : "";
-            event.setFormat(prefix + playerName + suffix + ChatColor.RESET + ": %2$s");
+        PrefixConfig config = plugin.getPrefixConfig();
+        Player player = event.getPlayer();
+
+        if (config.isChat()) {
+            String prefix = "";
+            String suffix = "";
+
+            if (recManager.isRec(player)) {
+                prefix = recManager.getPlayerPrefix(player);
+            }
+
+            if (afkManager.isAfk(player)) {
+                suffix = afkManager.getPlayerSuffix(player);
+            }
+
+            String finalName = ColorUtil.colorize(prefix) + ChatColor.RESET + player.getName() + ChatColor.RESET + ColorUtil.colorize(suffix);
+            event.setFormat(finalName + ChatColor.RESET + ": %2$s");
         }
-        plugin.getAfkManager().updateActivity(event.getPlayer());
+
+        afkManager.updateActivity(event.getPlayer());
     }
 
     @EventHandler
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
-        plugin.getAfkManager().updateActivity(event.getPlayer());
+        afkManager.updateActivity(event.getPlayer());
     }
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            if (plugin.getAfkManager().isAfk(player)) {
+            if (afkManager.isAfk(player)) {
                 event.setCancelled(true);
             }
         }
@@ -95,7 +132,7 @@ public class PlayerListener implements Listener {
             block.getWorld().getNearbyEntities(block.getLocation(), 2, 2, 2).forEach(entity -> {
                 if (entity instanceof Player) {
                     Player player = (Player) entity;
-                    if (plugin.getAfkManager().isAfk(player)) {
+                    if (afkManager.isAfk(player)) {
                         event.setCancelled(true);
                     }
                 }
@@ -109,7 +146,7 @@ public class PlayerListener implements Listener {
             block.getWorld().getNearbyEntities(block.getLocation(), 2, 2, 2).forEach(entity -> {
                 if (entity instanceof Player) {
                     Player player = (Player) entity;
-                    if (plugin.getAfkManager().isAfk(player)) {
+                    if (afkManager.isAfk(player)) {
                         event.setCancelled(true);
                     }
                 }
