@@ -30,22 +30,22 @@ public class PrefixConfigManager extends BasicConfigHandler {
     private @NotNull MessagesConfig getMessages() {
         ConfigurationSection section = config.getConfigurationSection("messages");
         if (section == null) return new MessagesConfig(
-            "&8[&6PrefixPro&8] &7",
-            "You are now AFK",
-            "You are no longer AFK",
-            "§cYou don't have permission to use this command!",
+            "§c[!] ",
+            "§fYou are now AFK",
+            "§fYou are no longer AFK",
+            "You don't have permission to use this command!",
             "This command can only be used by players!",
-            "§cUsage: /prefixpro reload",
+            "Usage: /prefixpro reload",
             "§aPlugin reloaded!",
             true
         );
 
-        String prefix = section.getString("prefix", "&8[&6PrefixPro&8] &7");
-        String playerNowAfk = section.getString("player_now_afk", "You are now AFK");
-        String playerNoLongerAfk = section.getString("player_no_longer_afk", "You are no longer AFK");
-        String playerNoPermission = section.getString("player_no_permission", "§cYou don't have permission to use this command!");
+        String prefix = section.getString("prefix", "§c[!] ");
+        String playerNowAfk = section.getString("player_now_afk", "§fYou are now AFK");
+        String playerNoLongerAfk = section.getString("player_no_longer_afk", "§fYou are no longer AFK");
+        String playerNoPermission = section.getString("player_no_permission", "You don't have permission to use this command!");
         String playerConsoleOnly = section.getString("player_console_only", "This command can only be used by players!");
-        String commandUsage = section.getString("command_usage", "§cUsage: /prefixpro reload");
+        String commandUsage = section.getString("command_usage", "Usage: /prefixpro reload");
         String commandPluginReloaded = section.getString("command_plugin_reloaded", "§aPlugin reloaded!");
         boolean joinLeaveMessage = section.getBoolean("join-leave-message", true);
 
@@ -95,9 +95,9 @@ public class PrefixConfigManager extends BasicConfigHandler {
 
     private @NotNull RecConfig getRec() {
         ConfigurationSection section = config.getConfigurationSection("rec");
-        if (section == null) return new RecConfig("§4[⏺] ");
+        if (section == null) return new RecConfig("§4[⏺] §f");
 
-        String prefix = section.getString("prefix", "§4[⏺] ");
+        String prefix = section.getString("prefix", "§4[⏺] §f");
 
         return new RecConfig(prefix);
     }

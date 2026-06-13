@@ -3,12 +3,12 @@ config-version: 3
 
 # Message Settings
 messages:
-  prefix: ""
-  player_now_afk: "You are now AFK"
-  player_no_longer_afk: "You are no longer AFK"
-  player_no_permission: "§cYou don't have permission to use this command!"
+  prefix: "§c[!] "
+  player_now_afk: "§fYou are now AFK"
+  player_no_longer_afk: "§fYou are no longer AFK"
+  player_no_permission: "You don't have permission to use this command!"
   player_console_only: "This command can only be used by players!"
-  command_usage: "§cUsage: /prefixprob reload"
+  command_usage: "Usage: /prefixprob reload"
   command_plugin_reloaded: "§aPlugin reloaded!"
   join-leave-message: true
 

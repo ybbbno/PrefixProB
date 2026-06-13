@@ -55,5 +55,6 @@ public class PrefixRecManager extends PlayerManager {
 
     public void cleanup(Player player) {
         recPlayers.remove(player.getUniqueId());
+        removePlayerPrefix(player);
     }
 }

@@ -130,5 +130,6 @@ public class SuffixAfkManager extends PlayerManager {
         cancelAfkTask(player);
         lastActivity.remove(player.getUniqueId());
         afkPlayers.remove(player.getUniqueId());
+        removePlayerSuffix(player);
     }
 }

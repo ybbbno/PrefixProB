@@ -60,7 +60,6 @@ public final class PrefixPro extends PluginProvider {
     public void onDisable() {
         afkManager.deinit();
         recManager.deinit();
-        logger.info("PrefixPro has been disabled!");
     }
 
     public void reload() {
