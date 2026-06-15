@@ -27,6 +27,8 @@ public class SuffixAfkManager extends PlayerManager {
         Bukkit.getOnlinePlayers().forEach(player -> {
             if (isAfk(player)) {
                 setAfk(player, true);
+            } else {
+                updateActivity(player);
             }
         });
     }
@@ -59,7 +61,7 @@ public class SuffixAfkManager extends PlayerManager {
     public void scheduleAfkCheck(Player player) {
         cancelAfkTask(player);
 
-        if (!config.afk().auto()) return;
+        if (!config.afk().auto() || afkTasks.containsKey(player.getUniqueId())) return;
 
         BukkitTask task = plugin.getServer().getScheduler().runTaskLater(plugin,
                 () -> setAfk(player, true),

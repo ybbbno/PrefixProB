@@ -35,7 +35,7 @@ public class PrefixConfigManager extends BasicConfigHandler {
             "§fYou are no longer AFK",
             "You don't have permission to use this command!",
             "This command can only be used by players!",
-            "Usage: /prefixpro reload",
+            "Usage: /prefixprob reload",
             "§aPlugin reloaded!",
             true
         );
@@ -45,7 +45,7 @@ public class PrefixConfigManager extends BasicConfigHandler {
         String playerNoLongerAfk = section.getString("player_no_longer_afk", "§fYou are no longer AFK");
         String playerNoPermission = section.getString("player_no_permission", "You don't have permission to use this command!");
         String playerConsoleOnly = section.getString("player_console_only", "This command can only be used by players!");
-        String commandUsage = section.getString("command_usage", "Usage: /prefixpro reload");
+        String commandUsage = section.getString("command_usage", "Usage: /prefixprob reload");
         String commandPluginReloaded = section.getString("command_plugin_reloaded", "§aPlugin reloaded!");
         boolean joinLeaveMessage = section.getBoolean("join-leave-message", true);
 

@@ -5,6 +5,8 @@ import com.samvolvo.prefixPro.managers.PrefixRecManager;
 import com.samvolvo.prefixPro.managers.SuffixAfkManager;
 import com.samvolvo.prefixPro.PrefixPro;
 import com.samvolvo.prefixPro.utils.ColorUtil;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
@@ -51,8 +53,8 @@ public class PlayerListener implements Listener {
             1L
         );
         
-        if (event.getPlayer().hasPermission("prefixprob.afk")) {
-            afkManager.updateActivity(event.getPlayer());
+        if (player.hasPermission("prefixprob.afk")) {
+            afkManager.updateActivity(player);
         }
     }
 
@@ -66,24 +68,26 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+
         // Only count movement if it's a block change (not just looking around)
-        if (event.getFrom().getBlockX() != event.getTo().getBlockX() ||
-            event.getFrom().getBlockY() != event.getTo().getBlockY() ||
-            event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-            
-            Player player = event.getPlayer();
-            
-            if (afkManager.isAfk(player)) {
-                // If player is actively moving (not just being pushed)
-                if (player.isSprinting() || player.isSneaking()) {
-                    afkManager.setAfk(player, false);
-                } else {
-                    // Cancel movement if being pushed
-                    event.setTo(event.getFrom());
-                }
+        Location from = event.getFrom();
+        Location to = event.getTo();
+
+        if (from.getBlockX() == to.getBlockX() &&
+            from.getBlockY() == to.getBlockY() &&
+            from.getBlockZ() == to.getBlockZ()) return;
+
+        if (afkManager.isAfk(player)) {
+            // If player is actively moving (not just being pushed)
+            if (player.isSprinting() || player.isSneaking()) {
+                afkManager.setAfk(player, false);
             } else {
-                afkManager.updateActivity(player);
+                // Cancel movement if being pushed
+                event.setTo(event.getFrom());
             }
+        } else {
+            afkManager.updateActivity(player);
         }
     }
 
