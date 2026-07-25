@@ -3,12 +3,14 @@ package com.samvolvo.prefixPro;
 import com.samvolvo.prefixPro.commands.AfkCommand;
 import com.samvolvo.prefixPro.commands.PrefixProCommand;
 import com.samvolvo.prefixPro.commands.RecCommand;
+import com.samvolvo.prefixPro.commands.RpCommand;
 import com.samvolvo.prefixPro.config.PrefixConfig;
 import com.samvolvo.prefixPro.config.PrefixConfigManager;
-import com.samvolvo.prefixPro.listeners.CustomJoinMessage;
 import com.samvolvo.prefixPro.listeners.PlayerListener;
-import com.samvolvo.prefixPro.managers.PrefixRecManager;
-import com.samvolvo.prefixPro.managers.SuffixAfkManager;
+import com.samvolvo.prefixPro.managers.PlayerManager;
+import com.samvolvo.prefixPro.managers.RecManager;
+import com.samvolvo.prefixPro.managers.AfkManager;
+import com.samvolvo.prefixPro.managers.RpManager;
 import me.deadybbb.ybmj.PluginProvider;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
@@ -16,11 +18,14 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 
 public final class PrefixPro extends PluginProvider {
-    private SuffixAfkManager afkManager;
-    private PrefixRecManager recManager;
-
     private PrefixConfigManager manager;
     private PrefixConfig config;
+
+    private PlayerManager playerManager;
+
+    private AfkManager afkManager;
+    private RecManager recManager;
+    private RpManager rpManager;
 
     public static @NotNull LuckPerms luckPermsProvider;
 
@@ -40,26 +45,36 @@ public final class PrefixPro extends PluginProvider {
         manager = new PrefixConfigManager(this);
         config = manager.getConfig();
 
-        afkManager = new SuffixAfkManager(this, config);
-        afkManager.init();
+        playerManager = new PlayerManager(this, config);
+        playerManager.init();
 
-        recManager = new PrefixRecManager(this, config);
-        recManager.init();
+        if (config.isRp()) {
+            rpManager = new RpManager(this, playerManager, config);
+            rpManager.init();
+            getCommand("rp").setExecutor(new RpCommand(this));
+        }
 
-        // Register events
+        if (config.isRec()) {
+            recManager = new RecManager(this, playerManager, config);
+            recManager.init();
+            getCommand("rec").setExecutor(new RecCommand(this));
+        }
+
+        if (config.isAfk()) {
+            afkManager = new AfkManager(this, playerManager, config);
+            afkManager.init();
+            getCommand("afk").setExecutor(new AfkCommand(this));
+        }
+
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
-        getServer().getPluginManager().registerEvents(new CustomJoinMessage(this), this);
-        
-        // Register commands
-        getCommand("afk").setExecutor(new AfkCommand(this, afkManager));
-        getCommand("rec").setExecutor(new RecCommand(this, recManager));
         getCommand("prefixprob").setExecutor(new PrefixProCommand(this));
     }
 
     @Override
     public void onDisable() {
-        afkManager.deinit();
+        rpManager.deinit();
         recManager.deinit();
+        afkManager.deinit();
     }
 
     public void reload() {
@@ -68,14 +83,20 @@ public final class PrefixPro extends PluginProvider {
     }
 
     public PrefixConfig getPrefixConfig() {
-        return new PrefixConfig(config.messages(), config.display(), config.rec(), config.afk());
+        return new PrefixConfig(config.messages(), config.display(), config.rec(), config.afk(), config.rp());
     }
 
-    public SuffixAfkManager getAfkManager() {
+    public AfkManager getAfkManager() {
         return afkManager;
     }
 
-    public PrefixRecManager getRecManager() {
+    public RecManager getRecManager() {
         return recManager;
     }
+
+    public RpManager getRpManager() {
+        return rpManager;
+    }
+
+    public PlayerManager getPlayerManager() { return playerManager; }
 }

@@ -1,88 +1,111 @@
 # PrefixPro
 
-PrefixPro is a powerful and lightweight Minecraft plugin that seamlessly integrates with LuckPerms to manage and display player prefixes. With extensive customization options and an advanced AFK system, it enhances your server's visual appearance and player interaction.
+A lightweight Paper plugin that manages dynamic player prefixes and suffixes for **RP**, **REC**, and **AFK** modes. It integrates with **LuckPerms** and supports tab list, chat, and nametag display (with optional nametag hiding).
 
-## ✨ Features
+## Features
 
-### 🎯 Core Features
-- **LuckPerms Integration:** Automatically displays prefixes from LuckPerms in:
-    - Tab list
-    - Chat
-    - Above-head nametags
-- **Real-time Updates:** Instantly applies prefix changes when modified in LuckPerms
-- **Configurable Display:** Toggle prefix visibility individually for tab, chat, and nametags
+- **RP mode** – Toggle a configurable RP prefix/suffix
+- **REC mode** – Toggle a recording indicator prefix/suffix
+- **AFK mode** – Toggle AFK status with:
+  - Configurable prefix/suffix
+  - Auto-AFK after inactivity
+  - Countdown when using the command
+  - Screen title + subtitle while AFK
+  - Invulnerability while AFK
+  - Exit AFK by sneaking
+  - Protection against being pushed by pistons / entities
+- Priority-based stacking of prefixes and suffixes
+- Optional display in **tab list**, **chat**, and **nametag**
+- LuckPerms prefix/suffix nodes for compatibility with other plugins
 
-### 🛡️ AFK System
-- **Auto-AFK:** Automatically marks players as AFK after 5 minutes (configurable)
-- **Disable AFK:** Sneak to get out of afk.
-- **AFK Command:** `/afk` to manually toggle AFK status
-- **Protection:** AFK players receive god mode and can't be pushed
-- **Visual Indicator:** Customizable AFK suffix shows other players who is AFK
-- **AFK Message:** A big title on your screen will tell you you are afk.
+## How it works
 
-### ⚙️ Administration
-- **Easy Configuration:** Simple config.yml with detailed comments
-- **Live Reloading:** Update settings without server restart
-    - `/prefixpro config reload` - Reload configuration
-    - `/prefixpro plugin reload` - Reload entire plugin
-- **Customizable Messages:** Configure all plugin messages with color support
+- Prefixes/suffixes are applied via **scoreboard teams** (nametag + tab) and **LuckPerms** nodes (for other plugins that read LuckPerms prefixes).
+- Multiple modes can be active at the same time; they are stacked according to priority.
+- AFK players are made invulnerable and cannot move.
+- Leaving AFK is done by sneaking (or by moving while sprinting / with velocity).
 
-## 🔧 Permissions
-- `prefixpro.admin` - Access to admin commands
-- `prefixpro.afk` - Access to AFK features
-- `prefixpro.version` - Receive update notifications on join
+## Requirements
 
-## 📋 Commands
-- `/afk` - Toggle AFK status
-- `/prefixpro <config|plugin> reload` - Reload configuration or plugin
+- Bukkit/Spigot/Paper 1.21+
+- [LuckPerms](https://luckperms.net/)
 
-## 📦 Dependencies
-- [LuckPerms](https://luckperms.net/) - Required for prefix management
+## Commands
 
-## ⚡ Performance
-- Lightweight and optimized
-- No database required
-- Minimal resource usage
+| Command            | Description                          | Permission          |
+|--------------------|--------------------------------------|---------------------|
+| `/rp`              | Toggle RP mode                       | `prefixprob.rp`     |
+| `/rec`             | Toggle REC (recording) mode          | `prefixprob.rec`    |
+| `/afk`             | Toggle AFK mode (with countdown)     | `prefixprob.afk`    |
+| `/prefixprob reload` | Reload the plugin configuration    | `prefixprob.reload` |
 
-## 🔍 Configuration
+## Permissions
 
-```
-# PrefixPro Configuration
-config-version: 3
+| Permission           | Default | Description                     |
+|----------------------|---------|---------------------------------|
+| `prefixprob.rp`      | op      | Use `/rp`                       |
+| `prefixprob.rec`     | op      | Use `/rec`                      |
+| `prefixprob.afk`     | op      | Use `/afk` and auto-AFK         |
+| `prefixprob.reload`  | op      | Reload the plugin               |
 
-# Display Settings
-display:
-  tab: true
-  chat: true
-  nametag: true
+## Configuration
 
-# Message Settings
+All options live in `config.yml`.
+
+### Messages
+
+```yaml
 messages:
-  prefix: "&8[&6PrefixPro&8] &7"
-  join-leave-message:
-    enabled: true
-
-# AFK Settings
-afk:
-  # Time in seconds before auto-AFK (300 = 5 minutes)
-  auto-time: 300
-  # Suffix that appears when AFK
-  suffix: " &7[AFK]"
-  # Enable auto-AFK feature
-  auto-enabled: true
-
+  prefix: "§c[!] "
+  player-now-afk: "§fYou are now AFK"
+  player-no-longer-afk: "§fYou are no longer AFK"
+  player-no-permission: "You don't have permission to use this command!"
+  player-console-only: "This command can only be used by players!"
+  command-usage: "Usage: /prefixprob reload"
+  command-plugin-reloaded: "§aPlugin reloaded!"
 ```
 
+### Display
 
-## 🎯 Coming Soon
-- Multi-language support
-- Placeholder API integration
-- Custom prefix commands
-- And more!
+```yaml
+display:
+  tab: true                 # Show prefix/suffix in the tab list
+  chat: true                # Show prefix/suffix in chat
+  is-nametag-visible: false # Hide the player name tag above the head
+```
 
-## 💬 Support
-Need help? Found a bug? Have a suggestion? Feel free to:
-- Open an issue on our [Github](https://github.com/SamVolvo/PrefixPro) repository
-- Join our [Discord](https://discord.gg/BejfuCsSUB) community
+### RP / REC / AFK sections
 
-Enhance your server's appearance and player interaction with PrefixPro - the complete prefix management solution!
+Each mode has:
+
+- `enabled` – enable/disable the feature
+- `prefix` / `suffix` – the text to apply
+- `prefix-priority` / `suffix-priority` – lower number = higher priority (appears first)
+
+**AFK** also supports:
+
+| Option                | Description                                      | Default |
+|-----------------------|--------------------------------------------------|---------|
+| `auto-enabled`        | Automatically set AFK after inactivity           | `true`  |
+| `auto-time`           | Seconds of inactivity before auto-AFK            | `300`   |
+| `countdown`           | Seconds countdown when using `/afk`              | `15`    |
+| `actionbar-countdown` | Actionbar message during countdown (`%s` = time) | …       |
+| `screen-title`        | Title shown on screen while AFK                  | `§cAFK` |
+| `screen-subtitle`     | Subtitle shown on screen while AFK               | …       |
+
+### Priority example
+
+With the default priorities:
+
+- REC prefix priority `0`
+- RP prefix priority `1`
+- AFK suffix priority `0`
+
+A player who is both REC + RP + AFK will see:
+```
+[⏺] [RP] PlayerName [⌚]
+```
+
+## License
+
+This project is open source under the MIT License. Feel free to modify and distribute — credit is appreciated but not required.

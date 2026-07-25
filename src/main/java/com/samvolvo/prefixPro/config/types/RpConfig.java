@@ -1,6 +1,6 @@
 package com.samvolvo.prefixPro.config.types;
 
-public record RecConfig(
+public record RpConfig(
         boolean enabled,
         PlayerConfig config
 ) { }

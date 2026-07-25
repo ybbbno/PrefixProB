@@ -1,12 +1,9 @@
 package com.samvolvo.prefixPro.config;
 
-import com.samvolvo.prefixPro.config.types.AfkConfig;
-import com.samvolvo.prefixPro.config.types.DisplayConfig;
-import com.samvolvo.prefixPro.config.types.MessagesConfig;
-import com.samvolvo.prefixPro.config.types.RecConfig;
+import com.samvolvo.prefixPro.config.types.*;
 import org.jetbrains.annotations.NotNull;
 
-public record PrefixConfig(MessagesConfig messages, DisplayConfig display, RecConfig rec, AfkConfig afk) {
+public record PrefixConfig(MessagesConfig messages, DisplayConfig display, RecConfig rec, AfkConfig afk, RpConfig rp) {
 
     public @NotNull String playerNowAfkMessage() {
         return setPrefixToMessage(messages.playerNowAfk());
@@ -40,12 +37,20 @@ public record PrefixConfig(MessagesConfig messages, DisplayConfig display, RecCo
         return display.chat();
     }
 
-    public boolean isNametag() {
-        return display.nametag();
+    public boolean isRec() {
+        return rec.enabled();
     }
 
-    public boolean isJoinLeaveMessages() {
-        return messages.isJoinLeave();
+    public boolean isAfk() {
+        return afk.enabled();
+    }
+
+    public boolean isRp() {
+        return rp.enabled();
+    }
+
+    public boolean isNametagVisible() {
+        return display.isNametagVisible();
     }
 
     private String setPrefixToMessage(String message) {

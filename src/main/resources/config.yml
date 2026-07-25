@@ -1,33 +1,59 @@
-# PrefixPro Configuration
-config-version: 3
-
 # Message Settings
 messages:
   prefix: "§c[!] "
-  player_now_afk: "§fYou are now AFK"
-  player_no_longer_afk: "§fYou are no longer AFK"
-  player_no_permission: "You don't have permission to use this command!"
-  player_console_only: "This command can only be used by players!"
-  command_usage: "Usage: /prefixprob reload"
-  command_plugin_reloaded: "§aPlugin reloaded!"
-  join-leave-message: true
+  player-now-afk: "§fYou are now AFK"
+  player-no-longer-afk: "§fYou are no longer AFK"
+  player-no-permission: "You don't have permission to use this command!"
+  player-console-only: "This command can only be used by players!"
+  command-usage: "Usage: /prefixprob reload"
+  command-plugin-reloaded: "§aPlugin reloaded!"
 
 # Display Settings
 display:
   tab: true
   chat: true
-  nametag: true
+  is-nametag-visible: false
 
+# RP prefix
+rp:
+  enabled: true
+  prefix: "§5[RP] §f"
+  prefix-priority: 1
+  suffix: ""
+  suffix-priority: -1
+
+# REC Settings
 rec:
+  enabled: true
+  # Prefix that appears when REC
   prefix: "§4[⏺] §f"
+  # Priority of the prefix
+  prefix-priority: 0
+  # Suffix that appears when REC
+  suffix: ""
+  # Priority of the suffix
+  suffix-priority: -1
 
 # AFK Settings
 afk:
-  # Time in seconds before auto-AFK (300 = 5 minutes)
-  auto-time: 300
+  enabled: true
+  # Prefix that appears when AFK
+  prefix: ""
+  # Priority of the prefix
+  prefix-priority: -1
   # Suffix that appears when AFK
   suffix: " &7[⌚]"
-  screen_title: "§cAFK"
-  screen_subtitle: "§7Sneak To exit AFK"
+  # Priority of the suffix
+  suffix-priority: 0
+  # Title on the screen when AFK
+  screen-title: "§cAFK"
+  # Subtitle on the screen when AFK
+  screen-subtitle: "§7Sneak To exit AFK"
   # Enable auto-AFK feature
   auto-enabled: true
+  # Time in seconds before auto-AFK (300 = 5 minutes)
+  auto-time: 300
+  # Time in seconds for become AFK with a command
+  countdown: 15
+  # Actionbar message with countdown for become AFK with a command
+  actionbar-countdown: "§7§oYou will become AFK in %s seconds"

@@ -3,19 +3,20 @@ package com.samvolvo.prefixPro.commands;
 import com.samvolvo.prefixPro.PrefixPro;
 import com.samvolvo.prefixPro.config.PrefixConfig;
 import com.samvolvo.prefixPro.managers.RecManager;
+import com.samvolvo.prefixPro.managers.RpManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class RecCommand implements CommandExecutor {
+public class RpCommand implements CommandExecutor {
     private final PrefixPro plugin;
-    private final RecManager manager;
+    private final RpManager manager;
 
-    public RecCommand(PrefixPro plugin) {
+    public RpCommand(PrefixPro plugin) {
         this.plugin = plugin;
-        this.manager = plugin.getRecManager();
+        this.manager = plugin.getRpManager();
     }
 
     @Override
@@ -33,7 +34,7 @@ public class RecCommand implements CommandExecutor {
             return true;
         }
 
-        manager.setRec(player, !manager.isRec(player));
+        manager.setRp(player, !manager.isRp(player));
         return true;
     }
 }

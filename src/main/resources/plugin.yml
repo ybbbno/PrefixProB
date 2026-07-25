@@ -16,6 +16,10 @@ commands:
     description: Toggle REC status
     usage: /rec
     permission: prefixprob.rec
+  rp:
+    description: Toggle RP status
+    usage: /rp
+    permission: prefixprob.rp
   prefixprob:
     description: Plugin management command
     usage: /prefixprob reload

@@ -1,12 +1,12 @@
 package com.samvolvo.prefixPro.listeners;
 
 import com.samvolvo.prefixPro.config.PrefixConfig;
-import com.samvolvo.prefixPro.managers.PrefixRecManager;
-import com.samvolvo.prefixPro.managers.SuffixAfkManager;
+import com.samvolvo.prefixPro.managers.PlayerManager;
+import com.samvolvo.prefixPro.managers.RecManager;
+import com.samvolvo.prefixPro.managers.AfkManager;
 import com.samvolvo.prefixPro.PrefixPro;
 import com.samvolvo.prefixPro.utils.ColorUtil;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
@@ -19,13 +19,13 @@ import org.bukkit.ChatColor;
 
 public class PlayerListener implements Listener {
     private final PrefixPro plugin;
-    private final SuffixAfkManager afkManager;
-    private final PrefixRecManager recManager;
+    private final PlayerManager manager;
+    private final AfkManager afkManager;
 
     public PlayerListener(PrefixPro plugin) {
         this.plugin = plugin;
+        this.manager = plugin.getPlayerManager();
         this.afkManager = plugin.getAfkManager();
-        this.recManager = plugin.getRecManager();
     }
 
     @EventHandler
@@ -46,13 +46,13 @@ public class PlayerListener implements Listener {
                     afkManager.setAfk(player, true);
                 }
 
-                if (recManager.isRec(player)) {
-                    recManager.setRec(player, true);
-                }
+//                if (recManager.isRec(player)) {
+//                    recManager.setRec(player, true);
+//                }
             },
             1L
         );
-        
+
         if (player.hasPermission("prefixprob.afk")) {
             afkManager.updateActivity(player);
         }
@@ -63,28 +63,32 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
 
         afkManager.cleanup(player);
-        recManager.cleanup(player);
+//        recManager.cleanup(player);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
+        if (!player.hasPermission("prefixprob.afk")) return;
 
-        // Only count movement if it's a block change (not just looking around)
         Location from = event.getFrom();
         Location to = event.getTo();
 
+        // Only real movement (block change)
         if (from.getBlockX() == to.getBlockX() &&
             from.getBlockY() == to.getBlockY() &&
-            from.getBlockZ() == to.getBlockZ()) return;
+            from.getBlockZ() == to.getBlockZ()) {
+            return;
+        }
 
         if (afkManager.isAfk(player)) {
-            // If player is actively moving (not just being pushed)
-            if (player.isSprinting() || player.isSneaking()) {
+            // Allow intentional movement to disable AFK
+            if (player.isSprinting() || player.isSneaking() ||
+                player.getVelocity().lengthSquared() > 0.01) {
                 afkManager.setAfk(player, false);
             } else {
-                // Cancel movement if being pushed
-                event.setTo(event.getFrom());
+                // Prevent being pushed by pistons/entities/etc.
+                event.setCancelled(true);
             }
         } else {
             afkManager.updateActivity(player);
@@ -97,16 +101,8 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
 
         if (config.isChat()) {
-            String prefix = "";
-            String suffix = "";
-
-            if (recManager.isRec(player)) {
-                prefix = recManager.getPlayerPrefix(player);
-            }
-
-            if (afkManager.isAfk(player)) {
-                suffix = afkManager.getPlayerSuffix(player);
-            }
+            String prefix = manager.getPlayerPrefix(player);
+            String suffix = manager.getPlayerSuffix(player);
 
             String finalName = ColorUtil.colorize(prefix) + ChatColor.RESET + player.getName() + ChatColor.RESET + ColorUtil.colorize(suffix);
             event.setFormat(finalName + ChatColor.RESET + ": %2$s");

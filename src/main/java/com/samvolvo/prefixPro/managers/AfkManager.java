@@ -1,6 +1,7 @@
 package com.samvolvo.prefixPro.managers;
 
 import com.samvolvo.prefixPro.config.PrefixConfig;
+import me.deadybbb.ybmj.BasicManagerHandler;
 import me.deadybbb.ybmj.PluginProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -10,20 +11,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class SuffixAfkManager extends PlayerManager {
+public class AfkManager extends BasicManagerHandler {
+    private final PlayerManager manager;
+    private final PrefixConfig config;
+
     private final Map<UUID, Long> lastActivity = new HashMap<>();
+
     private final Map<UUID, BukkitTask> afkTasks = new HashMap<>();
     private final Map<UUID, Boolean> afkPlayers = new HashMap<>();
     private final Map<UUID, BukkitTask> afkTitleTasks = new HashMap<>();
 
-    public SuffixAfkManager(PluginProvider plugin, PrefixConfig config) {
-        super(plugin, config);
+    private final Map<UUID, BukkitTask> countdownTasks = new HashMap<>();
+
+    public AfkManager(PluginProvider plugin, PlayerManager manager, PrefixConfig config) {
+        super(plugin);
+        this.manager = manager;
+        this.config = config;
     }
 
     @Override
     protected void onInit() {
-        super.onInit();
-
         Bukkit.getOnlinePlayers().forEach(player -> {
             if (isAfk(player)) {
                 setAfk(player, true);
@@ -35,13 +42,26 @@ public class SuffixAfkManager extends PlayerManager {
 
     @Override
     protected void onDeinit() {
-        super.onDeinit();
-
         Bukkit.getOnlinePlayers().forEach(this::cleanup);
     }
 
+    public void cancelPendingAfkTasks(Player player) {
+        UUID uuid = player.getUniqueId();
+        cancelAfkTask(player);
+
+        BukkitTask countdown = countdownTasks.remove(uuid);
+        if (countdown != null) countdown.cancel();
+    }
+
+    public void registerCountdownTask(Player player, BukkitTask task) {
+        cancelPendingAfkTasks(player);
+        countdownTasks.put(player.getUniqueId(), task);
+    }
+
     public void updateActivity(Player player) {
-        if (!player.hasPermission("prefixpro.afk")) return;
+        if (!player.hasPermission("prefixprob.afk")) return;
+
+        cancelPendingAfkTasks(player);
 
         if (isAfk(player) && !player.isSneaking()) return;
 
@@ -49,9 +69,9 @@ public class SuffixAfkManager extends PlayerManager {
 
         if (isAfk(player)) {
             setAfk(player, false);
+        } else {
+            scheduleAfkCheck(player);
         }
-
-        scheduleAfkCheck(player);
     }
 
     public boolean isAfk(Player player) {
@@ -61,7 +81,9 @@ public class SuffixAfkManager extends PlayerManager {
     public void scheduleAfkCheck(Player player) {
         cancelAfkTask(player);
 
-        if (!config.afk().auto() || afkTasks.containsKey(player.getUniqueId())) return;
+        if (!isInit() || !config.afk().auto() || afkTasks.containsKey(player.getUniqueId())) {
+            return;
+        }
 
         BukkitTask task = plugin.getServer().getScheduler().runTaskLater(plugin,
                 () -> setAfk(player, true),
@@ -79,26 +101,24 @@ public class SuffixAfkManager extends PlayerManager {
     }
 
     public void setAfk(Player player, boolean afk) {
-        if (!player.hasPermission("prefixpro.afk")) {
-            plugin.logger.warning("Player " + player.getName() + " attempted to use AFK without permission");
-            return;
-        }
+        if (!player.hasPermission("prefixprob.afk")) return;
 
-        Boolean currentAfk = afkPlayers.get(player.getUniqueId());
-        if (currentAfk != null && currentAfk == afk) return;
+        UUID uuid = player.getUniqueId();
+        Boolean current = afkPlayers.get(uuid);
+        if (current != null && current == afk) return;
 
-        afkPlayers.put(player.getUniqueId(), afk);
+        afkPlayers.put(uuid, afk);
 
         if (afk) {
             player.setInvulnerable(true);
             player.sendMessage(config.playerNowAfkMessage());
-            setPlayerSuffix(player, config.afk().suffix());
+            manager.setPlayerConfig(player, config.afk().config());
             startAfkTitle(player);
-            cancelAfkTask(player);
+            cancelPendingAfkTasks(player);
         } else {
             player.setInvulnerable(false);
             player.sendMessage(config.playerNoLongerAfkMessage());
-            removePlayerSuffix(player);
+            manager.removePlayerConfig(player, config.afk().config());
             stopAfkTitle(player);
             scheduleAfkCheck(player);
         }
@@ -106,6 +126,8 @@ public class SuffixAfkManager extends PlayerManager {
 
     public void startAfkTitle(Player player) {
         stopAfkTitle(player);
+
+        if (!isInit()) return;
 
         BukkitTask task = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
             if (!player.isOnline() || !isAfk(player)) {
@@ -129,9 +151,20 @@ public class SuffixAfkManager extends PlayerManager {
     }
 
     public void cleanup(Player player) {
-        cancelAfkTask(player);
-        lastActivity.remove(player.getUniqueId());
-        afkPlayers.remove(player.getUniqueId());
-        removePlayerSuffix(player);
+        UUID uuid = player.getUniqueId();
+
+        cancelPendingAfkTasks(player);
+        stopAfkTitle(player);
+
+        if (Boolean.TRUE.equals(afkPlayers.get(uuid))) {
+            player.setInvulnerable(false);
+            manager.removePlayerConfig(player, config.afk().config());
+        }
+
+        afkTasks.remove(uuid);
+        afkTitleTasks.remove(uuid);
+        countdownTasks.remove(uuid);
+        lastActivity.remove(uuid);
+        afkPlayers.remove(uuid);
     }
 }

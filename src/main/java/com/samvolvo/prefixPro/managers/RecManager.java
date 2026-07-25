@@ -1,7 +1,7 @@
 package com.samvolvo.prefixPro.managers;
 
-import com.samvolvo.prefixPro.PrefixPro;
 import com.samvolvo.prefixPro.config.PrefixConfig;
+import me.deadybbb.ybmj.BasicManagerHandler;
 import me.deadybbb.ybmj.PluginProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -9,17 +9,20 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class PrefixRecManager extends PlayerManager {
+public class RecManager extends BasicManagerHandler {
+    private final PlayerManager manager;
+    private final PrefixConfig config;
+
     private final HashMap<UUID, Boolean> recPlayers = new HashMap<>();
 
-    public PrefixRecManager(PluginProvider plugin, PrefixConfig config) {
-        super(plugin, config);
+    public RecManager(PluginProvider plugin, PlayerManager manager, PrefixConfig config) {
+        super(plugin);
+        this.manager = manager;
+        this.config = config;
     }
 
     @Override
     protected void onInit() {
-        super.onInit();
-
         Bukkit.getOnlinePlayers().forEach(player -> {
             if (isRec(player)) {
                 setRec(player, true);
@@ -29,8 +32,6 @@ public class PrefixRecManager extends PlayerManager {
 
     @Override
     protected void onDeinit() {
-        super.onDeinit();
-
         Bukkit.getOnlinePlayers().forEach(this::cleanup);
     }
 
@@ -43,9 +44,9 @@ public class PrefixRecManager extends PlayerManager {
         recPlayers.put(uuid, rec);
 
         if (rec) {
-            setPlayerPrefix(player, config.rec().prefix());
+            manager.setPlayerConfig(player, config.rec().config());
         } else {
-            removePlayerPrefix(player);
+            manager.removePlayerConfig(player, config.rec().config());
         }
     }
 
@@ -55,6 +56,6 @@ public class PrefixRecManager extends PlayerManager {
 
     public void cleanup(Player player) {
         recPlayers.remove(player.getUniqueId());
-        removePlayerPrefix(player);
+        manager.removePlayerConfig(player, config.rec().config());
     }
 }

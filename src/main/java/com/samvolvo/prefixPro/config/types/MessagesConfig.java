@@ -7,6 +7,5 @@ public record MessagesConfig(
         String playerNoPermissions,
         String playerConsoleOnly,
         String commandUsage,
-        String commandPluginReloaded,
-        boolean isJoinLeave
+        String commandPluginReloaded
 ) { }
