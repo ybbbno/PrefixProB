@@ -13,7 +13,6 @@ A lightweight Paper plugin that manages dynamic player prefixes and suffixes for
   - Screen title + subtitle while AFK
   - Invulnerability while AFK
   - Exit AFK by sneaking
-  - Protection against being pushed by pistons / entities
 - Priority-based stacking of prefixes and suffixes
 - Optional display in **tab list**, **chat**, and **nametag**
 - LuckPerms prefix/suffix nodes for compatibility with other plugins
